@@ -15,12 +15,40 @@
         <div class="row">
             <div class="col-6">
                 <h3> Enviar Mensaje </h3>
-                
+                <hr />
+                <input type="text" 
+                    id="txtUid"
+                    class="form-control mb-2"
+                    placeholder="uid"
+                    autocomplete="false" 
+                >
 
+                <input type="text" 
+                    id="txtMensaje"
+                    class="form-control mb-2"
+                    placeholder="Mensaje
+                    autocomplete="false" 
+                >
+
+                <h3> Usuarios </h3>
+                <hr/>
+                <ul id="lista-usuarios"></ul>
+
+            </div>
+            <div class="col-6">
+                <h3> Chats </h3>
+                <div class="card">
+                    <div id="chats-body" class="card-body"></div>
+                </div>
+                <h3> Privados </h3>
+                <div class="card">
+                    <div id="private" class="card-body"></div>
+                </div>
             </div>
         </div>
     </div>
     <script src="./socket.io/socket.io.js"></script>
-    <script src="./js/socket-client.js"></script>    
+    <script src="./js/socket-client.js"></script> 
+    <script src="./js/chat.js"></script> 
 </body>
 </html>
