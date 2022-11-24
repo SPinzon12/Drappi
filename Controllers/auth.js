@@ -40,6 +40,7 @@ const loginUsuario = async (req, res = express.request ) => {
     const { name, email, password } = req.body;
     
     try {
+        
         let usuario = await Usuario.findOne({email:email})
         if (!usuario) {
             return res.status(400).json({
