@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt')
 
 const crearUsuario = async (req, res = express.request ) => {
-   const { name, email, password } = req.body;
+   const { email, password } = req.body;
    try {
         let usuario = await Usuario.findOne({email:email})
         if (usuario) {
@@ -19,9 +19,12 @@ const crearUsuario = async (req, res = express.request ) => {
         usuario.password = bcrypt.hashSync(password,salt);
         await usuario.save();
 
+        const token = await (generarJWT(usuario.id, usuario.name))
+
         res.status(200).json({
             ok: true,
             usuario,
+            token
            }); 
    } catch (err){
         console.log(err);
@@ -30,8 +33,7 @@ const crearUsuario = async (req, res = express.request ) => {
             err
         })
    }
-
-   
+  
 }
 
 const loginUsuario = async (req, res = express.request ) => {
@@ -54,7 +56,7 @@ const loginUsuario = async (req, res = express.request ) => {
             })
         }
 
-        const token = await (generarJWT(usuario._id, usuario.name))
+        const token = await (generarJWT(usuario.id, usuario.name))
 
         res.status(200).json({
             ok: true,
@@ -83,8 +85,127 @@ const revalidarToken = async (req, res = express.request ) => {
     }); 
 }
 
+
+const addToCart  = async (req, res = express.request ) => {
+    const { email, product } = req.body;
+    console.log(email, product)
+    try {
+        let inCart = await Usuario.aggregate([{ $match: { email: email}},{ $unwind: "$cart" },{ $match: {"cart.name": product.name}},{$replaceRoot:{'newRoot': '$cart'}}])
+        if (inCart.length == 0) {
+            product.quantity = 1
+            await Usuario.updateOne({ email: email },{ $addToSet: {cart:product} })
+            res.status(200).json({
+                ok: true,
+                msg: 'Se agrego producto'
+            })
+        } else {
+            inCart[0].quantity = inCart[0].quantity + 1
+            await Usuario.updateOne({$and:[{email: email},{'cart.name':product.name}] }, {$set: {'cart.$.quantity':inCart[0].quantity}})
+            res.status(200).json({
+                ok: true,
+                msg: 'Se aumento la cantidad del producto',
+            })
+        }
+    }catch (err) {
+        console.log(err)
+        res.status(500).json({
+            ok: false,
+            msg: 'Error Interno'
+        })
+    }
+}
+
+const incrementQuantity  = async (req, res = express.request ) => {
+    const { email, product } = req.body;
+    let inCart = await Usuario.aggregate([{ $match: { email: email}},{ $unwind: "$cart" },{ $match: {"cart.name": product.name}},{$replaceRoot:{'newRoot': '$cart'}}])
+    inCart[0].quantity = inCart[0].quantity + 1
+    await Usuario.updateOne({$and:[{email: email},{'cart.name':product.name}] }, {$set: {'cart.$.quantity':inCart[0].quantity}})
+
+    try {
+        res.status(200).json({
+            ok: true,
+            msg: 'Se aumento la cantidad del producto',
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            ok: false,
+            msg: 'Error Interno'
+        })
+    }
+}
+
+const decrementQuantity = async (req, res = express.request ) => {
+    const { email, product } = req.body;
+    let inCart = await Usuario.aggregate([{ $match: { email: email}},{ $unwind: "$cart" },{ $match: {"cart.name": product.name}},{$replaceRoot:{'newRoot': '$cart'}}])
+    inCart[0].quantity = inCart[0].quantity - 1
+    try{
+        if(inCart[0].quantity === 0){
+            await Usuario.updateOne({email: email}, {$pull: {cart:{ name : product.name}}})
+            res.status(200).json({
+                ok: true,
+                msg: 'Se elimino el producto',
+            })
+        }else{
+            await Usuario.updateOne({$and:[{email: email},{'cart.name':product.name}] }, {$set: {'cart.$.quantity':inCart[0].quantity}})
+            res.status(200).json({
+                ok: true,
+                msg: 'Se disminuyo la cantidad del producto',
+            })
+        }
+    }catch (err) {
+        console.log(err)
+        res.status(500).json({
+            ok: false,
+            msg: 'Error Interno'
+        })
+    }
+
+}
+
+const inCart = async (req, res = express.request) => {
+    const {email} = req.body
+    let inCart = await Usuario.find({ email: email });
+    inCart = inCart[0].cart
+    try {
+        res.status(200).json({
+            ok: true,
+            inCart,
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            ok: false,
+            msg: 'Error Interno'
+        })
+    }
+}
+
+const deleteCart = async (req, res = express.request) => {
+    const {email} = req.body
+    await Usuario.updateOne({email: email}, {$unset:{cart:[]}})
+    await Usuario.updateOne({email: email}, {$set:{cart:[]}})
+    try {
+        res.status(200).json({
+            ok: true,
+            msg: 'Se eliminaron los productos del carrito',
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            ok: false,
+            msg: 'Error Interno'
+        })
+    }
+}
+
 module.exports = {
     loginUsuario,
     crearUsuario,
-    revalidarToken
+    revalidarToken,
+    addToCart,
+    incrementQuantity,
+    decrementQuantity,
+    inCart,
+    deleteCart
 }

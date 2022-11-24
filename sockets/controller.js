@@ -1,5 +1,3 @@
-const { createLogger } = require("vuex");
-
 const usuarios = [];
 
 const socketController = (socket, io) => {

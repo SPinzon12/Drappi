@@ -13,7 +13,8 @@ class Server {
 
         this.paths = {
             auth: '/api/auth',
-            tasks: '/api/task'
+            tasks: '/api/task',
+            shop: '/api/shop',
         }
 
         this.connectToDB();
@@ -35,6 +36,7 @@ class Server {
     setRoutes() {
         this.app.use( this.paths.auth, require('../routes/auth'))
         this.app.use( this.paths.tasks, require('../routes/task'))
+        this.app.use( this.paths.shop, require('../routes/shop'))
     }
 
     sockets() {

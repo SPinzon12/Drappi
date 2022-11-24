@@ -1,11 +1,19 @@
 const express = require('express')
 const router = express.Router();
 const { check } = require('express-validator');
-const { crearUsuario, loginUsuario, revalidarToken } = require('../Controllers/auth');
+const { crearUsuario, loginUsuario, revalidarToken, addToCart, incrementQuantity, decrementQuantity, inCart, deleteCart  } = require('../Controllers/auth');
 const { validarCampos } = require('../middlewares/validar-campos')
 const { validarJWT } = require('../middlewares/validar-token')
 
+router.post('/inc', incrementQuantity)
+
 router.post('/', loginUsuario )
+
+router.post('/add', addToCart )
+
+router.post('/del', deleteCart)
+
+router.post('/dec', decrementQuantity)
 
 router.post(
     '/new',
@@ -19,4 +27,5 @@ router.post(
 
 router.get('/renew', validarJWT ,revalidarToken)
 
+router.post('/cart', inCart )
 module.exports = router;

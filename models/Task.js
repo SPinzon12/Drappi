@@ -3,7 +3,8 @@ const { Schema, model } = require('mongoose');
 const TaskSchema = Schema({
     title: {
         type: String,
-        require: true
+        require: true,
+        unique: true
     },
     user: {
         type: Schema.Types.ObjectId,
@@ -13,7 +14,7 @@ const TaskSchema = Schema({
 
 TaskSchema.method('toJSON', function () {
     const {__v, _id, ...object } = this.toObject();
-    object.id = id;
+    object.id = _id;
     return object
 })
 module.exports = model('Task', TaskSchema)

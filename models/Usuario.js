@@ -5,6 +5,14 @@ const UsuarioSchema = Schema({
         type: String,
         require: true
     },
+    phone:{
+        type: String,
+        require: true
+    },
+    address:{
+        type: String,
+        require: true
+    },
     email: {
         type: String,
         require: true,
@@ -13,7 +21,16 @@ const UsuarioSchema = Schema({
     password: {
         type: String,
         require: true
+    },
+    cart: {
+        type: Array
     }
+
 })
 
+UsuarioSchema.method('toJSON', function () {
+    const {__v, _id, ...object } = this.toObject();
+    object.id = _id;
+    return object
+})
 module.exports = model('Usuario', UsuarioSchema)
