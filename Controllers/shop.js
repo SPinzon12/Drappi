@@ -75,6 +75,7 @@ const inShop = async(req, res = express.request) => {
 
 }
 
+
 const deleteProduct = async(req, res = express.request) => {
     const { shop, product } = req.body    
     await Shop.updateOne({name: shop.name}, {$pull: {products:{ name : product.name}}})
