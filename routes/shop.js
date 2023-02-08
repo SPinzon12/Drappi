@@ -8,6 +8,7 @@ router.post('/new', createShop)
 
 router.post('/add', addProduct)
 
+
 router.post('/delp', deleteProduct)
 
 router.post('/dels', deleteShop)
