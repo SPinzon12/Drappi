@@ -1,13 +1,12 @@
 const express = require('express')
 const router = express.Router();
 const { createShop, addProduct, inShop, deleteProduct, deleteShop, loginShop, updateShop, updateProduct, userShop } = require('../Controllers/shop');
-const { validarCampos } = require('../middlewares/validar-campos')
-const { validarJWT } = require('../middlewares/validar-token')
+// const { validarCampos } = require('../middlewares/validar-campos')
+// const { validarJWT } = require('../middlewares/validar-token')
 
 router.post('/new', createShop)
 
 router.post('/add', addProduct)
-
 
 router.post('/delp', deleteProduct)
 
