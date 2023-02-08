@@ -205,6 +205,7 @@ const updateProduct = async(req, res = express.request) => {
     }
 }
 
+
 const userShop = async(req, res = express.request) => {
     const {name} = req.body
     let inShop = await Shop.find({ name: name });
